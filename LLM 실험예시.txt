@@ -11,7 +11,7 @@
 Prompt 0. Build
 ============================================================
 
-{SERVER_NAME} MCP tool을 실제 호출해서 Search Keyword Dictionary workload 실험을 시작해줘.
+{SERVER_NAME} MCP tool을 실제 호출해서 Approximate Filters 비교를 위한 Search Keyword Dictionary workload 실험을 시작해줘.
 
 반드시 실제 tool response만 사용하고, 지원하지 않는 기능은 N/A로 표시해줘.
 

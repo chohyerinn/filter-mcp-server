@@ -1,4 +1,36 @@
-## 1. Project Scenario
+# Approximate Filters Project Guide
+
+## 1. Topic Flow
+
+**Topic:** Approximate Filters  
+**Subtitle:** Bloom Filter, Counting Bloom Filter, Cuckoo Filter, and SuRF Comparison using MCP Servers
+
+이 프로젝트의 흐름은 다음과 같다.
+
+```text
+정확한 Set은 key 전체를 저장하므로 메모리를 많이 사용한다.
+-> Approximate Filter는 key 전체 대신 compact summary를 저장해 메모리를 줄인다.
+-> 대신 false positive, delete 지원 여부, query 종류 제한 같은 trade-off가 생긴다.
+-> Bloom / Counting Bloom / Cuckoo는 approximate membership query를 비교한다.
+-> SuRF는 prefix/range query까지 가능한 approximate range filter로 비교한다.
+-> Naive Set은 approximate filter가 아니라 exact baseline으로 사용한다.
+```
+
+발표 첫 멘트:
+
+> 저희 주제는 Approximate Filters입니다. Approximate Filter는 메모리를 줄이기 위해 key 전체를 저장하지 않고 압축된 정보로 membership이나 range query를 처리하는 자료구조입니다. 대신 false positive 같은 trade-off가 발생합니다.
+
+Naive Set 설명:
+
+> Naive Set은 approximate filter는 아니지만, 정확한 결과를 제공하는 exact baseline으로 사용했습니다.
+
+SuRF 설명:
+
+> SuRF는 Bloom/Cuckoo처럼 단순 membership만 보는 필터가 아니라, sorted string key에서 prefix/range query를 지원하는 approximate range filter입니다.
+
+---
+
+## 2. Project Scenario
 
 **Search Keyword Dictionary Management**  
 검색 플랫폼의 키워드 사전 운영
@@ -8,23 +40,23 @@
 memory usage, false positive rate, latency, 그리고 SuRF의 prefix/range query
 장점을 비교한다.
 
-> 자동완성 서비스를 만드는 것이 아니라, 키워드 사전 운영이라는 하나의 workload를 통해 각 membership filter의 장단점을 비교한다.
+> 자동완성 서비스를 만드는 것이 아니라, 키워드 사전 운영이라는 하나의 workload를 통해 approximate filters의 trade-off를 비교한다.
 
 ---
 
-## 2. Five MCP Servers
+## 3. Five MCP Servers
 
 | Member | MCP Server | Data Structure | Role |
 | --- | --- | --- | --- |
 | A | `filter-naive` | Naive Set / Hash Table | Exact baseline |
-| B | `filter-bloom` | Standard Bloom Filter | Memory-efficient membership filter |
+| B | `filter-bloom` | Standard Bloom Filter | Memory-efficient approximate membership filter |
 | C | `filter-counting-bloom` | Counting Bloom Filter | Bloom Filter with deletion support |
-| D | `filter-cuckoo` | Cuckoo Filter | Fingerprint-based filter with deletion |
-| E | `filter-surf` | Simplified SuRF | Prefix/range query filter |
+| D | `filter-cuckoo` | Cuckoo Filter | Fingerprint-based approximate membership filter |
+| E | `filter-surf` | Simplified SuRF | Approximate prefix/range filter |
 
 ---
 
-## 3. Common ADT
+## 4. Common ADT
 
 모든 MCP 서버는 같은 ADT 메서드 이름을 사용한다.
 지원하지 않는 기능은 에러를 던지지 않고 `supported: false`와 `"N/A"`를 반환한다.
@@ -59,7 +91,7 @@ config를 넘기면 새 config로 빈 필터를 다시 만든다.
 
 ---
 
-## 4. Support Matrix
+## 5. Support Matrix
 
 | Server | `contains` | `insert` | `delete` | `prefix_query` | `range_query` |
 | --- | --- | --- | --- | --- | --- |
@@ -77,7 +109,7 @@ Note:
 
 ---
 
-## 5. SuRF Simplified Explanation
+## 6. SuRF Simplified Explanation
 
 SuRF는 **Succinct Range Filter**의 약자이다. Sorted String Table 위에서
 prefix/range query를 빠르게 처리하기 위해 설계된 trie 기반 approximate filter이다.
@@ -107,7 +139,7 @@ Hash를 거치면 key의 사전식 순서와 prefix 구조가 사라지므로 `p
 
 ---
 
-## 6. Config
+## 7. Config
 
 ```json
 {
@@ -140,7 +172,7 @@ SuRF 실험 튜닝:
 
 ---
 
-## 7. Common Response Schema
+## 8. Common Response Schema
 
 Supported response:
 
@@ -197,7 +229,7 @@ SuRF의 FPR 해석:
 
 ---
 
-## 8. Experiment Metrics
+## 9. Experiment Metrics
 
 이 프로젝트는 filter 자료구조 비교이므로 정렬 알고리즘용 지표를 사용하지 않는다.
 
@@ -225,7 +257,7 @@ SuRF의 FPR 해석:
 
 ---
 
-## 9. Experiment Call Groups
+## 10. Experiment Call Groups
 
 | Purpose | MCP Calls | What It Shows |
 | --- | --- | --- |
@@ -249,7 +281,7 @@ Business action과 ADT의 연결:
 
 ---
 
-## 10. Dataset Design
+## 11. Dataset Design
 
 Capture keywords:
 
@@ -303,7 +335,7 @@ Prefix queries:
 
 ---
 
-## 11. Team Member LLM Experiment Prompt
+## 12. Team Member LLM Experiment Prompt
 
 각 팀원은 `{SERVER_NAME}`만 자기 서버 이름으로 바꿔서 사용한다.
 
@@ -382,25 +414,26 @@ Experiment 5. Operation cost
 
 ---
 
-## 12. Slide Mapping
+## 13. Slide Mapping
 
 | Slide | Title | Content |
 | --- | --- | --- |
-| 1 | Title | Search Keyword Dictionary Management with MCP Filters |
-| 2 | Scenario | 검색 플랫폼 키워드 사전 운영 |
-| 3 | Five MCP Servers | 5개 MCP 서버 소개 |
-| 4 | Common ADT | 공통 ADT 메서드와 지원 여부 |
-| 5 | SuRF Simplified | 왜 SuRF가 prefix/range query를 지원하는지 설명 |
-| 6 | Dataset Design | 1,000 build, 1,000 absent, 100 delete, prefix groups |
-| 7 | MCP Call Flow / LLM Tool Capture | LLM이 MCP 서버를 호출하는 실제 화면 |
-| 8 | Exp 1-2 Results | Memory + FPR 비교 |
-| 9 | Exp 3 Results | Insert/Delete 비교 |
-| 10 | Exp 4 Results | Prefix/Range, SuRF 장점 |
-| 11 | LLM Summary / Conclusion | 상황별 추천과 trade-off 정리 |
+| 1 | Title | Approximate Filters |
+| 2 | Topic Flow | exact set -> approximate filters -> trade-offs |
+| 3 | Scenario | 검색 플랫폼 키워드 사전 운영 |
+| 4 | Five MCP Servers | 5개 MCP 서버 소개 |
+| 5 | Common ADT | 공통 ADT 메서드와 지원 여부 |
+| 6 | SuRF Simplified | 왜 SuRF가 prefix/range query를 지원하는지 설명 |
+| 7 | Dataset Design | 1,000 build, 1,000 absent, 100 delete, prefix groups |
+| 8 | MCP Call Flow / LLM Tool Capture | LLM이 MCP 서버를 호출하는 실제 화면 |
+| 9 | Exp 1-2 Results | Memory + FPR 비교 |
+| 10 | Exp 3 Results | Insert/Delete 비교 |
+| 11 | Exp 4 Results | Prefix/Range, SuRF 장점 |
+| 12 | LLM Summary / Conclusion | 상황별 추천과 trade-off 정리 |
 
 ---
 
-## 13. Conclusion Message
+## 14. Conclusion Message
 
 | Situation | Best Choice | Reason |
 | --- | --- | --- |
