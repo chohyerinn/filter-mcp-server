@@ -402,16 +402,6 @@ Experiment 5. Operation cost
 | 10 | Exp 4 Results | Prefix/Range, SuRF 장점 |
 | 11 | LLM Summary / Conclusion | 상황별 추천과 trade-off 정리 |
 
-10분 시간 배분:
-
-| Part | Time |
-| --- | --- |
-| Scenario + servers | 2분 |
-| ADT + SuRF 설명 | 2분 |
-| Dataset + MCP capture | 2분 |
-| Experiments 1-4 | 3분 |
-| Conclusion | 1분 |
-
 ---
 
 ## 13. Conclusion Message
