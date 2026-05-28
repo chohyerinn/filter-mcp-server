@@ -107,8 +107,6 @@ Hash를 거치면 key의 사전식 순서와 prefix 구조가 사라지므로 `p
 | Range query | `bisect_left`로 `lo <= key < hi` 구간 계산 |
 | Approximation | prefix/suffix 정보 손실 때문에 false positive 가능 |
 
-발표 멘트:
-
 > SuRF의 강점은 FPR이 가장 낮다는 점이 아니라, 다른 membership filter들이 지원하지 못하는 prefix/range query를 지원한다는 점입니다. 저희 구현은 full LOUDS SuRF가 아니라 핵심 아이디어를 보여주는 simplified trie-based range filter입니다.
 
 ---
@@ -226,7 +224,6 @@ SuRF의 FPR 해석:
 | swap count | 정렬 알고리즘 지표라 filter 비교와 무관 |
 | stability | 정렬 결과의 상대 순서 보존 여부라 filter ADT와 무관 |
 
-발표 주의:
 
 > Bloom Filter 예시 페이지에 comparison count, stability 같은 표현이 있더라도, 이 프로젝트에서는 filter에 맞는 지표인 FPR, memory, latency, delete support, prefix/range support만 사용한다.
 
@@ -427,6 +424,5 @@ Experiment 5. Operation cost
 | 자동완성 prefix query가 필요함 | SuRF | trie 기반 prefix/range 지원 |
 | 균형 잡힌 membership filter가 필요함 | Cuckoo | compact + delete 지원 |
 
-마무리 멘트:
 
 > 하나의 자료구조가 모든 상황에서 최고인 것은 아닙니다. 같은 ADT와 같은 데이터셋으로 5개 MCP 서버를 비교해보면, 각 필터는 정확성, 메모리, 삭제 지원, false positive, prefix/range query에서 서로 다른 trade-off를 가집니다.
