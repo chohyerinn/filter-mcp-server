@@ -131,7 +131,6 @@ All MCP servers provide the following tools:
 
 ## Repository Structure
 
-# Repository Structure
 
 ```text
 src/
