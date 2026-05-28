@@ -1,72 +1,147 @@
-# Approximate Filters
+# Approximate Filters using MCP Servers
 
-## Bloom Filter, Counting Bloom Filter, Cuckoo Filter, and SuRF Comparison using MCP Servers
+## Overview
 
-This project compares approximate filters through MCP servers and LLM tool calls.
-Approximate filters reduce memory usage by storing compact summaries instead of
-full keys. The trade-off is that some structures may return false positives or
-support only limited operations.
+This project compares several approximate filter data structures using MCP servers and LLM tool calls.
 
-Implemented servers:
+Approximate filters reduce memory usage by storing compressed summaries instead of full keys.  
+Because of this trade-off, some filters may return false positives or support limited operations.
 
-| MCP Server | Data Structure | Role |
-| --- | --- | --- |
-| `filter-naive` | Naive Set / Hash Table | Exact baseline |
-| `filter-bloom` | Standard Bloom Filter | Memory-efficient approximate membership filter |
+The project compares:
+
+- Bloom Filter
+- Counting Bloom Filter
+- Cuckoo Filter
+- SuRF (Simplified Version)
+
+An exact hash-set server is also included as a baseline for comparison.
+
+---
+
+# Implemented MCP Servers
+
+| MCP Server | Data Structure | Description |
+|---|---|---|
+| `filter-naive` | Exact Set / Hash Table | Exact membership baseline |
+| `filter-bloom` | Bloom Filter | Memory-efficient approximate membership filter |
 | `filter-counting-bloom` | Counting Bloom Filter | Bloom Filter with deletion support |
-| `filter-cuckoo` | Cuckoo Filter | Fingerprint-based approximate membership filter |
+| `filter-cuckoo` | Cuckoo Filter | Fingerprint-based approximate filter |
 | `filter-surf` | Simplified SuRF | Approximate prefix/range filter |
 
-Scenario:
+---
 
-> Search Keyword Dictionary Management
+# Project Goal
 
-The same keyword workload is used across all servers to compare membership lookup,
-false positive rate, memory usage, latency, insertion/deletion support, and
-prefix/range query capability.
+The goal of this project is to compare how different filter structures behave under the same workload.
 
-Project flow:
+The comparison focuses on:
 
-1. Start with exact set membership as the baseline.
-2. Compare approximate membership filters: Bloom, Counting Bloom, and Cuckoo.
-3. Extend the comparison to SuRF, an approximate range filter for prefix/range queries.
-4. Let an LLM call the MCP servers using the same ADT and workload.
+- membership query accuracy
+- false positive rate
+- memory usage
+- query latency
+- insertion and deletion support
+- prefix and range query capability
 
-Note:
+All servers expose the same ADT-style interface through MCP tools so that they can be tested consistently.
 
-- `filter-naive` is not an approximate filter. It is included as the exact baseline.
-- SuRF is not only a point membership filter. It is included because approximate filters can also target prefix/range workloads.
+---
 
-Claude Desktop MCP config example:
+# Scenario
+
+## Search Keyword Dictionary Management
+
+The servers simulate a keyword search system.
+
+Examples:
+- search autocomplete
+- keyword lookup
+- blocked-word checking
+- dictionary membership testing
+
+The same keyword dataset and queries are used across all filters to compare performance and behavior.
+
+---
+
+# Common MCP Tools
+
+All MCP servers provide the following tools:
+
+| Tool | Description |
+|---|---|
+| `build(items)` | Build filter from dataset |
+| `insert(x)` | Insert a key |
+| `contains(x)` | Membership query |
+| `delete(x)` | Delete a key if supported |
+| `range_query(lo, hi)` | Range query |
+| `prefix_query(prefix)` | Prefix query |
+| `memory_usage()` | Return estimated memory usage |
+| `false_positive_rate()` | Measure false positive rate |
+
+---
+
+# Structure Comparison
+
+| Structure | False Positives | Delete Support | Prefix/Range Query | Memory Efficiency |
+|---|---|---|---|---|
+| Exact Set | No | Yes | Yes | Low |
+| Bloom Filter | Yes | No | No | Very High |
+| Counting Bloom Filter | Yes | Yes | No | High |
+| Cuckoo Filter | Yes | Yes | No | High |
+| Simplified SuRF | Yes | No | Yes | Medium |
+
+---
+
+# Notes
+
+- `filter-naive` is included as the exact baseline.
+- The SuRF server is a simplified educational implementation, not a full LOUDS-based production SuRF.
+- The project focuses on comparison and experimentation rather than production optimization.
+
+---
+
+# Example Claude Desktop MCP Configuration
 
 ```json
 {
   "mcpServers": {
     "filter-naive": {
-      "command": "C:\\Users\\chohy\\OneDrive\\문서\\DataStructure\\.venv\\Scripts\\python.exe",
-      "args": ["C:\\Users\\chohy\\OneDrive\\문서\\DataStructure\\src\\filter_\\filter_naive_server.py"]
+      "command": "python",
+      "args": ["src/filter_/filter_naive_server.py"]
     },
     "filter-bloom": {
-      "command": "C:\\Users\\chohy\\OneDrive\\문서\\DataStructure\\.venv\\Scripts\\python.exe",
-      "args": ["C:\\Users\\chohy\\OneDrive\\문서\\DataStructure\\src\\filter_\\filter_bloom_server.py"]
+      "command": "python",
+      "args": ["src/filter_/filter_bloom_server.py"]
     },
     "filter-counting-bloom": {
-      "command": "C:\\Users\\chohy\\OneDrive\\문서\\DataStructure\\.venv\\Scripts\\python.exe",
-      "args": ["C:\\Users\\chohy\\OneDrive\\문서\\DataStructure\\src\\filter_\\filter_counting_bloom_server.py"]
+      "command": "python",
+      "args": ["src/filter_/filter_counting_bloom_server.py"]
     },
     "filter-cuckoo": {
-      "command": "C:\\Users\\chohy\\OneDrive\\문서\\DataStructure\\.venv\\Scripts\\python.exe",
-      "args": ["C:\\Users\\chohy\\OneDrive\\문서\\DataStructure\\src\\filter_\\filter_cuckoo_server.py"]
+      "command": "python",
+      "args": ["src/filter_/filter_cuckoo_server.py"]
     },
     "filter-surf": {
-      "command": "C:\\Users\\chohy\\OneDrive\\문서\\DataStructure\\.venv\\Scripts\\python.exe",
-      "args": ["C:\\Users\\chohy\\OneDrive\\문서\\DataStructure\\src\\filter_\\filter_surf_server.py"]
+      "command": "python",
+      "args": ["src/filter_/filter_surf_server.py"]
     }
   }
 }
-```
 
-See:
 
-- `filter_project_final_guide.md`
-- `LLM 실험예시.txt`
+# Repository Structure
+
+src/
+├── filter_/
+│   ├── filter_naive_server.py
+│   ├── filter_bloom_server.py
+│   ├── filter_counting_bloom_server.py
+│   ├── filter_cuckoo_server.py
+│   └── filter_surf_server.py
+│
+└── membership_filters/
+    ├── base.py
+    ├── hashing.py
+    ├── mcp_server.py
+    ├── registry.py
+    └── filters/
