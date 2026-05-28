@@ -16,7 +16,7 @@ The project compares:
 
 An exact hash-set server is also included as a baseline for comparison.
 
----
+
 
 ## Implemented MCP Servers
 
@@ -28,7 +28,7 @@ An exact hash-set server is also included as a baseline for comparison.
 | `filter-cuckoo` | Cuckoo Filter | Fingerprint-based approximate filter |
 | `filter-surf` | Simplified SuRF | Approximate prefix/range filter |
 
----
+
 
 ## Project Goal
 
@@ -45,7 +45,7 @@ The comparison focuses on:
 
 All servers expose the same ADT-style interface through MCP tools so that they can be tested consistently.
 
----
+
 
 ## Scenario
 
@@ -61,7 +61,7 @@ Examples:
 
 The same keyword dataset and queries are used across all filters to compare performance and behavior.
 
----
+
 
 ## Common MCP Tools
 
@@ -78,7 +78,6 @@ All MCP servers provide the following tools:
 | `memory_usage()` | Return estimated memory usage |
 | `false_positive_rate()` | Measure false positive rate |
 
----
 
 ## Structure Comparison
 
@@ -90,7 +89,7 @@ All MCP servers provide the following tools:
 | Cuckoo Filter | Yes | Yes | No | High |
 | Simplified SuRF | Yes | No | Yes | Medium |
 
----
+
 
 ## Notes
 
@@ -98,7 +97,7 @@ All MCP servers provide the following tools:
 - The SuRF server is a simplified educational implementation, not a full LOUDS-based production SuRF.
 - The project focuses on comparison and experimentation rather than production optimization.
 
----
+
 
 ## Example Claude Desktop MCP Configuration
 
@@ -128,6 +127,32 @@ All MCP servers provide the following tools:
   }
 }
 ```
+## System Flow
+
+```text
+Claude / LLM
+        ↓
+MCP Tool Call
+        ↓
+mcp_server.py
+        ↓
+registry.py
+        ↓
+Selected Filter Class
+        ↓
+Bloom / Counting Bloom / Cuckoo / SuRF / Exact Set
+```
+
+### Flow Description
+
+1. The LLM sends an MCP tool request.
+2. `mcp_server.py` exposes the common ADT-style tools.
+3. `registry.py` selects the requested filter implementation.
+4. The selected filter processes the query.
+5. The result is returned back through the MCP server.
+
+This design allows all filters to be tested through the same interface and workload.
+
 
 ## Repository Structure
 
