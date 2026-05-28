@@ -18,7 +18,7 @@ An exact hash-set server is also included as a baseline for comparison.
 
 ---
 
-# Implemented MCP Servers
+## Implemented MCP Servers
 
 | MCP Server | Data Structure | Description |
 |---|---|---|
@@ -30,7 +30,7 @@ An exact hash-set server is also included as a baseline for comparison.
 
 ---
 
-# Project Goal
+## Project Goal
 
 The goal of this project is to compare how different filter structures behave under the same workload.
 
@@ -47,9 +47,9 @@ All servers expose the same ADT-style interface through MCP tools so that they c
 
 ---
 
-# Scenario
+## Scenario
 
-## Search Keyword Dictionary Management
+### Search Keyword Dictionary Management
 
 The servers simulate a keyword search system.
 
@@ -63,7 +63,7 @@ The same keyword dataset and queries are used across all filters to compare perf
 
 ---
 
-# Common MCP Tools
+## Common MCP Tools
 
 All MCP servers provide the following tools:
 
@@ -80,7 +80,7 @@ All MCP servers provide the following tools:
 
 ---
 
-# Structure Comparison
+## Structure Comparison
 
 | Structure | False Positives | Delete Support | Prefix/Range Query | Memory Efficiency |
 |---|---|---|---|---|
@@ -92,7 +92,7 @@ All MCP servers provide the following tools:
 
 ---
 
-# Notes
+## Notes
 
 - `filter-naive` is included as the exact baseline.
 - The SuRF server is a simplified educational implementation, not a full LOUDS-based production SuRF.
@@ -100,7 +100,7 @@ All MCP servers provide the following tools:
 
 ---
 
-# Example Claude Desktop MCP Configuration
+## Example Claude Desktop MCP Configuration
 
 ```json
 {
@@ -129,7 +129,7 @@ All MCP servers provide the following tools:
 }
 
 
-# Repository Structure
+## Repository Structure
 
 src/
 ├── filter_/
