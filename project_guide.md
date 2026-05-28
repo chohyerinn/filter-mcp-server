@@ -1,5 +1,3 @@
-# Filter Comparison Project - Final Guide
-
 ## 1. Project Scenario
 
 **Search Keyword Dictionary Management**  
@@ -9,8 +7,6 @@
 이 시나리오 하나로 5개 필터의 membership query, insert/delete 지원 여부,
 memory usage, false positive rate, latency, 그리고 SuRF의 prefix/range query
 장점을 비교한다.
-
-핵심 메시지:
 
 > 자동완성 서비스를 만드는 것이 아니라, 키워드 사전 운영이라는 하나의 workload를 통해 각 membership filter의 장단점을 비교한다.
 
