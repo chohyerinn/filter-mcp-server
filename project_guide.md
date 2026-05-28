@@ -22,7 +22,7 @@
 
 > SuRF는 Bloom/Cuckoo처럼 단순 membership만 보는 필터가 아니라, sorted string key에서 prefix/range query를 지원하는 approximate range filter입니다.
 
----
+
 
 ## 2. Project Scenario
 
@@ -36,7 +36,7 @@ memory usage, false positive rate, latency, 그리고 SuRF의 prefix/range query
 
 > 자동완성 서비스를 만드는 것이 아니라, 키워드 사전 운영이라는 하나의 workload를 통해 approximate filters의 trade-off를 비교한다.
 
----
+
 
 ## 3. Five MCP Servers
 
@@ -48,7 +48,7 @@ memory usage, false positive rate, latency, 그리고 SuRF의 prefix/range query
 | D | `filter-cuckoo` | Cuckoo Filter | Fingerprint-based approximate membership filter |
 | E | `filter-surf` | Simplified SuRF | Approximate prefix/range filter |
 
----
+
 
 ## 4. Common ADT
 
@@ -83,7 +83,7 @@ reset() 호출 후 필터는 비어 있다.
 config를 넘기면 새 config로 빈 필터를 다시 만든다.
 ```
 
----
+
 
 ## 5. Support Matrix
 
@@ -99,7 +99,7 @@ config를 넘기면 새 config로 빈 필터를 다시 만든다.
 - Naive Set은 exact baseline이지만 prefix/range query는 전체 scan 기반이라 큰 데이터에서는 비효율적이다.
 - SuRF는 trie 기반이라 prefix/range query를 지원할 수 있다.
 
----
+
 
 ## 6. SuRF Simplified Explanation
 
@@ -128,7 +128,7 @@ Hash를 거치면 key의 사전식 순서와 prefix 구조가 사라지므로 `p
 
 > SuRF의 강점은 FPR이 가장 낮다는 점이 아니라, 다른 membership filter들이 지원하지 못하는 prefix/range query를 지원한다는 점이다.
 
----
+
 
 ## 7. Config
 
@@ -161,7 +161,7 @@ SuRF 실험 튜닝:
 - 발표에서 SuRF의 approximate 성격을 보여주려면 `trie_depth=5` 정도도 실험해볼 수 있다.
 - 단, 최종 결론에서는 SuRF의 핵심을 FPR이 아니라 prefix/range 지원으로 설명한다.
 
----
+
 
 ## 8. Common Response Schema
 
@@ -216,7 +216,7 @@ Unsupported response:
 
 > SuRF의 FPR은 단순 point membership 성능만을 보기 위한 지표가 아니라, prefix/range query에서 approximate result가 얼마나 오탐을 만들 수 있는지를 보는 지표로 해석한다.
 
----
+
 
 ## 9. Experiment Metrics
 
@@ -244,7 +244,7 @@ Unsupported response:
 
 > Bloom Filter 예시 페이지에 comparison count, stability 같은 표현이 있더라도, 이 프로젝트에서는 filter에 맞는 지표인 FPR, memory, latency, delete support, prefix/range support만 사용한다.
 
----
+
 
 ## 10. Experiment Call Groups
 
@@ -268,7 +268,7 @@ Business action과 ADT의 연결:
 | 만료 키워드 제거 | `delete(x)` |
 | 금칙어 해제 | `delete(x)` |
 
----
+
 
 ## 11. Dataset Design
 
