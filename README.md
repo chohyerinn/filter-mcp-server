@@ -63,7 +63,7 @@ The same keyword dataset and queries are used across all filters to compare perf
 
 
 
-## Common MCP Tools
+## ADT
 
 All MCP servers provide the following tools:
 
