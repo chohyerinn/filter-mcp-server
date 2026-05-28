@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "membership-filter-mcp"
+version = "0.1.0"
+description = "MCP servers comparing Naive Set, Bloom, Counting Bloom, Cuckoo, and simplified SuRF filters."
+requires-python = ">=3.11"
+dependencies = [
+    "mcp[cli]>=1.0,<2.0",
+]
+
+[project.optional-dependencies]
+dev = []
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-dir]
+"" = "src"

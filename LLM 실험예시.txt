@@ -1,0 +1,130 @@
+아래 프롬프트에서 {SERVER_NAME}만 자기 서버 이름으로 바꿔 사용한다.
+
+서버 이름:
+- filter-naive
+- filter-bloom
+- filter-counting-bloom
+- filter-cuckoo
+- filter-surf
+
+============================================================
+Prompt 0. Build
+============================================================
+
+{SERVER_NAME} MCP tool을 실제 호출해서 Search Keyword Dictionary workload 실험을 시작해줘.
+
+반드시 실제 tool response만 사용하고, 지원하지 않는 기능은 N/A로 표시해줘.
+
+다음 items와 config로 build()를 호출해줘.
+
+items:
+["app", "apple", "application", "appstore", "banana", "bank", "baseball", "camera", "campus", "car"]
+
+config:
+{
+  "target_fpr": 0.01,
+  "expected_items": 10,
+  "fingerprint_bits": 12,
+  "bucket_size": 4,
+  "counter_bits": 4,
+  "suffix_bits": 8,
+  "trie_depth": 8
+}
+
+build 결과에서 n_items, build_time_ms, config_used를 표로 정리해줘.
+
+============================================================
+Prompt A. Membership + FPR
+============================================================
+
+{SERVER_NAME} MCP tool을 실제 호출해서 membership과 false positive 실험을 수행해줘.
+
+호출:
+1. contains("apple")
+2. contains("applf")
+3. memory_usage()
+
+그 다음 absent_queries_1000을 만들어 false_positive_rate(absent_queries_1000)를 호출해줘.
+
+absent_queries_1000 구성:
+- typo-like absent query 500개
+  예: applf_000 ~ applf_249, bananna_000 ~ bananna_249
+- random absent query 500개
+  예: xyz_000 ~ xyz_249, qwerty_000 ~ qwerty_249
+
+결과 표:
+| Method | Result | Supported | Exact | May False Positive | Time | Notes |
+
+마지막에 theoretical FPR과 measured FPR을 비교해줘.
+memory_usage()의 bytes와 bits_per_item도 함께 요약해줘.
+추측하지 말고 실제 tool response만 사용해줘.
+
+============================================================
+Prompt B. Insert/Delete
+============================================================
+
+{SERVER_NAME} MCP tool을 실제 호출해서 insert/delete 실험을 수행해줘.
+
+호출:
+1. insert("applepay")
+2. contains("applepay")
+3. delete("appstore")
+4. contains("appstore")
+
+의미:
+- applepay는 build 시점에 없던 새 트렌딩 키워드
+- appstore는 만료되어 삭제되는 키워드
+
+결과 표:
+| Method | Result | Supported | Exact | May False Positive | Time | Notes |
+
+마지막에 이 서버가 동적 update에 적합한지 delete support 관점에서 요약해줘.
+특히 Standard Bloom Filter가 delete를 지원하지 않는 이유도 설명해줘.
+추측하지 말고 실제 tool response만 사용해줘.
+
+============================================================
+Prompt C. Prefix/Range
+============================================================
+
+{SERVER_NAME} MCP tool을 실제 호출해서 prefix/range 실험을 수행해줘.
+
+호출:
+1. prefix_query("app")
+2. range_query("app", "banana")
+
+range_query("app", "banana")는 사전식 순서 기준으로 app 이상 banana 미만을 조회하는 half-open interval이야.
+
+matched keyword 예시는 실제 tool response가 아니라 build dataset 기준 설명으로만 제시해줘.
+새로운 keyword를 추측해서 만들지 마.
+예: build dataset 안에서 "app" prefix에 해당하는 app, apple, application, appstore
+
+결과 표:
+| Method | Matched Count / Result | Supported | Exact | May False Positive | Time | Notes |
+
+마지막에 prefix/range capability 관점에서 이 서버의 장점과 한계를 요약해줘.
+추측하지 말고 실제 tool response만 사용해줘.
+
+============================================================
+Prompt D. Operation Summary
+============================================================
+
+{SERVER_NAME}에서 지금까지 실제 MCP tool로 얻은 결과만 사용해서 요약해줘.
+
+다음 관점으로 정리해줘.
+
+1. memory_usage()
+2. false_positive_rate()
+3. delete support
+4. prefix/range capability
+5. latency
+
+호출하지 않은 값은 추측하지 말고 "not measured"라고 표시해줘.
+latency는 각 MCP response의 query_time_us, insert_time_us, delete_time_us를 기준으로 요약해줘.
+
+결과 표:
+| Category | Result | Interpretation |
+
+마지막에 Search Keyword Dictionary workload 기준으로:
+- 어떤 상황에 적합한지
+- 어떤 trade-off 때문에 부적합한지
+각각 1문장씩 설명해줘.
