@@ -16,15 +16,9 @@
 -> Naive Set은 approximate filter가 아니라 exact baseline으로 사용한다.
 ```
 
-발표 첫 멘트:
-
-> 저희 주제는 Approximate Filters입니다. Approximate Filter는 메모리를 줄이기 위해 key 전체를 저장하지 않고 압축된 정보로 membership이나 range query를 처리하는 자료구조입니다. 대신 false positive 같은 trade-off가 발생합니다.
-
-Naive Set 설명:
+> Approximate Filter는 메모리를 줄이기 위해 key 전체를 저장하지 않고 압축된 정보로 membership이나 range query를 처리하는 자료구조입니다. 대신 false positive 같은 trade-off가 발생합니다.
 
 > Naive Set은 approximate filter는 아니지만, 정확한 결과를 제공하는 exact baseline으로 사용했습니다.
-
-SuRF 설명:
 
 > SuRF는 Bloom/Cuckoo처럼 단순 membership만 보는 필터가 아니라, sorted string key에서 prefix/range query를 지원하는 approximate range filter입니다.
 
@@ -101,8 +95,6 @@ config를 넘기면 새 config로 빈 필터를 다시 만든다.
 | Cuckoo Filter | approximate | supported | supported | N/A | N/A |
 | SuRF simplified | approximate | static / N/A | static / N/A | approximate | approximate |
 
-Note:
-
 - Bloom 계열과 Cuckoo Filter는 hash 기반이라 key의 순서나 prefix 정보를 저장하지 않는다.
 - Naive Set은 exact baseline이지만 prefix/range query는 전체 scan 기반이라 큰 데이터에서는 비효율적이다.
 - SuRF는 trie 기반이라 prefix/range query를 지원할 수 있다.
@@ -122,7 +114,6 @@ Hash를 거치면 key의 사전식 순서와 prefix 구조가 사라지므로 `p
 키워드가 있는지, 또는 사전식 구간 안에 들어가는 키워드가 있는지를 확인할 수 있다.
 이 점이 검색어 자동완성이나 정렬된 키워드 구간 조회에서 SuRF를 넣는 이유이다.
 
-이번 프로젝트의 `filter-surf`는 논문 수준의 전체 SuRF 구현이 아니다.
 실제 SuRF의 LOUDS-Dense / LOUDS-Sparse encoding 전체를 구현하지 않고,
 아래 아이디어만 단순화해서 구현한다.
 
@@ -135,7 +126,7 @@ Hash를 거치면 key의 사전식 순서와 prefix 구조가 사라지므로 `p
 | Range query | `bisect_left`로 `lo <= key < hi` 구간 계산 |
 | Approximation | prefix/suffix 정보 손실 때문에 false positive 가능 |
 
-> SuRF의 강점은 FPR이 가장 낮다는 점이 아니라, 다른 membership filter들이 지원하지 못하는 prefix/range query를 지원한다는 점입니다. 저희 구현은 full LOUDS SuRF가 아니라 핵심 아이디어를 보여주는 simplified trie-based range filter입니다.
+> SuRF의 강점은 FPR이 가장 낮다는 점이 아니라, 다른 membership filter들이 지원하지 못하는 prefix/range query를 지원한다는 점이다.
 
 ---
 
@@ -223,8 +214,6 @@ Unsupported response:
 }
 ```
 
-SuRF의 FPR 해석:
-
 > SuRF의 FPR은 단순 point membership 성능만을 보기 위한 지표가 아니라, prefix/range query에서 approximate result가 얼마나 오탐을 만들 수 있는지를 보는 지표로 해석한다.
 
 ---
@@ -298,8 +287,6 @@ campus
 car
 ```
 
-주의:
-
 - `applepay`는 build data에 넣지 않는다.
 - `applepay`는 새 트렌딩 키워드 insert 실험에 사용한다.
 
@@ -339,109 +326,3 @@ Prefix queries:
 
 각 팀원은 `{SERVER_NAME}`만 자기 서버 이름으로 바꿔서 사용한다.
 
-```text
-{SERVER_NAME} 서버를 실제 MCP tool로 호출해서 실험해줘.
-
-실험 시나리오:
-Search Keyword Dictionary Management
-
-검색 플랫폼은 키워드 사전을 운영합니다.
-키워드가 이미 등록되어 있는지 확인하고,
-새로운 트렌딩 키워드를 추가하며,
-만료된 키워드를 삭제해야 합니다.
-또한 자동완성을 위해 prefix query가 필요하고,
-정렬된 키워드 구간 조회를 위해 range query도 사용할 수 있습니다.
-
-먼저 아래 데이터셋을 build해줘.
-
-build_items:
-[
-  "app",
-  "apple",
-  "application",
-  "appstore",
-  "banana",
-  "bank",
-  "baseball",
-  "camera",
-  "campus",
-  "car"
-]
-
-config:
-{
-  "target_fpr": 0.01,
-  "expected_items": 10,
-  "fingerprint_bits": 12,
-  "bucket_size": 4,
-  "counter_bits": 4,
-  "suffix_bits": 8,
-  "trie_depth": 8
-}
-
-그 다음 아래 실험을 순서대로 실제 MCP tool로 호출해줘.
-
-Experiment 1. Membership accuracy
-1. contains("apple")
-2. contains("applf")
-
-Experiment 2. Dynamic update
-3. insert("applepay")
-4. contains("applepay")
-
-Experiment 3. Deletion
-5. delete("appstore")
-6. contains("appstore")
-
-Experiment 4. Autocomplete / range query
-7. prefix_query("app")
-8. range_query("app", "banana")
-
-Experiment 5. Operation cost
-9. memory_usage()
-10. false_positive_rate(["applf", "bananna", "cammera", "xyz_001", "qwerty_042"])
-
-중요:
-- 추측하지 말고 반드시 실제 {SERVER_NAME} MCP tool 호출 결과만 사용해줘.
-- 지원하지 않는 기능은 N/A로 표시해줘.
-- 결과는 아래 표 형식으로 정리해줘.
-
-표 형식:
-| Experiment | Method | Result | Supported | Exact | May False Positive | Time | Notes |
-
-마지막에 이 서버가 검색 키워드 사전 운영 시나리오에서 어떤 장점과 한계를 가지는지 3줄로 요약해줘.
-```
-
----
-
-## 13. Slide Mapping
-
-| Slide | Title | Content |
-| --- | --- | --- |
-| 1 | Title | Approximate Filters |
-| 2 | Topic Flow | exact set -> approximate filters -> trade-offs |
-| 3 | Scenario | 검색 플랫폼 키워드 사전 운영 |
-| 4 | Five MCP Servers | 5개 MCP 서버 소개 |
-| 5 | Common ADT | 공통 ADT 메서드와 지원 여부 |
-| 6 | SuRF Simplified | 왜 SuRF가 prefix/range query를 지원하는지 설명 |
-| 7 | Dataset Design | 1,000 build, 1,000 absent, 100 delete, prefix groups |
-| 8 | MCP Call Flow / LLM Tool Capture | LLM이 MCP 서버를 호출하는 실제 화면 |
-| 9 | Exp 1-2 Results | Memory + FPR 비교 |
-| 10 | Exp 3 Results | Insert/Delete 비교 |
-| 11 | Exp 4 Results | Prefix/Range, SuRF 장점 |
-| 12 | LLM Summary / Conclusion | 상황별 추천과 trade-off 정리 |
-
----
-
-## 14. Conclusion Message
-
-| Situation | Best Choice | Reason |
-| --- | --- | --- |
-| 정확성이 가장 중요함 | Naive Set | false positive 없음 |
-| 메모리를 가장 아껴야 함 | Standard Bloom | compact bit array |
-| 삭제가 자주 필요함 | Counting Bloom / Cuckoo | delete 지원 |
-| 자동완성 prefix query가 필요함 | SuRF | trie 기반 prefix/range 지원 |
-| 균형 잡힌 membership filter가 필요함 | Cuckoo | compact + delete 지원 |
-
-
-> 하나의 자료구조가 모든 상황에서 최고인 것은 아닙니다. 같은 ADT와 같은 데이터셋으로 5개 MCP 서버를 비교해보면, 각 필터는 정확성, 메모리, 삭제 지원, false positive, prefix/range query에서 서로 다른 trade-off를 가집니다.
