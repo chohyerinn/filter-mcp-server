@@ -131,6 +131,9 @@ All MCP servers provide the following tools:
 
 ## Repository Structure
 
+# Repository Structure
+
+```text
 src/
 ├── filter_/
 │   ├── filter_naive_server.py
@@ -145,3 +148,4 @@ src/
     ├── mcp_server.py
     ├── registry.py
     └── filters/
+```
