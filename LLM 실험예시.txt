@@ -8,11 +8,15 @@
 - filter-surf
 
 ============================================================
-쉬운 실험 프롬프트
+공부용 + 발표용 LLM 실험 프롬프트
 ============================================================
 
 {SERVER_NAME} 서버를 실제 MCP tool로 호출해서
 "검색창 자동완성 사전 관리" 실험을 해줘.
+
+목표:
+단순히 결과만 표로 보여주지 말고,
+이 필터가 어떤 원리로 동작하고 어떤 장단점이 있는지 공부할 수 있게 설명해줘.
 
 상황:
 검색 서비스에 아래 10개의 검색어가 등록되어 있다고 가정해.
@@ -36,46 +40,106 @@ config는 아래 값을 사용해줘.
 그 다음 아래 상황을 하나씩 실제 MCP tool로 확인해줘.
 
 1. 사용자가 "apple"을 검색했다.
-   -> 이 검색어가 사전에 있는지 contains("apple")로 확인해줘.
+   -> contains("apple")
 
 2. 사용자가 "applf"라고 오타를 입력했다.
-   -> 실제로 없는 검색어인데, 서버가 있다고 착각하는지 contains("applf")로 확인해줘.
+   -> contains("applf")
 
 3. "applepay"가 새 트렌드 검색어가 되었다.
-   -> insert("applepay")로 추가하고, contains("applepay")로 확인해줘.
+   -> insert("applepay")
+   -> contains("applepay")
 
 4. "appstore"는 오래된 검색어라 삭제해야 한다.
-   -> delete("appstore")로 삭제하고, contains("appstore")로 확인해줘.
+   -> delete("appstore")
+   -> contains("appstore")
 
 5. 사용자가 검색창에 "app"까지만 입력했다.
-   -> prefix_query("app")로 자동완성 후보가 몇 개인지 확인해줘.
+   -> prefix_query("app")
 
 6. 사전식 순서로 "app" 이상, "banana" 미만의 검색어 묶음을 보고 싶다.
-   -> range_query("app", "banana")로 확인해줘.
+   -> range_query("app", "banana")
 
 7. 이 서버가 메모리를 얼마나 쓰는지 확인하고 싶다.
-   -> memory_usage()로 확인해줘.
+   -> memory_usage()
 
 8. 없는 검색어를 있다고 착각하는 비율을 보고 싶다.
-   -> 없는 검색어 1000개를 만들어 false_positive_rate(absent_queries_1000)를 호출해줘.
+   -> false_positive_rate(absent_queries_1000)
 
    absent_queries_1000 구성:
    - 오타형 500개: applf_000 ~ applf_249, bananna_000 ~ bananna_249
    - 랜덤형 500개: xyz_000 ~ xyz_249, qwerty_000 ~ qwerty_249
-
-결과는 표로 정리해줘.
-
-표에는 다음 항목을 넣어줘:
-| 상황 | 호출한 MCP method | 결과 | 지원 여부 | 걸린 시간 | 짧은 해석 |
 
 중요:
 - 반드시 실제 {SERVER_NAME} MCP tool 호출 결과만 사용해줘.
 - 지원하지 않는 기능은 N/A라고 써줘.
 - 추측해서 결과를 만들지 마.
 - prefix_query나 range_query가 matched_count만 반환하면, keyword 예시는 build dataset 기준 설명으로만 적어줘.
+- 실제 tool response에서 나온 값과, 네가 설명을 위해 해석한 내용을 구분해줘.
 
-마지막에 이 서버가 검색창 자동완성 사전 관리에서 어떤 경우에 적합하고,
-어떤 trade-off 때문에 부적합한지 각각 1문장씩 정리해줘.
+============================================================
+원하는 출력 형식
+============================================================
+
+1. 한눈에 보는 요약
+
+아래 형식으로 먼저 요약해줘.
+
+| 질문 | 쉬운 답 |
+| --- | --- |
+| 이 필터는 정확한가, 근사적인가? | exact / approximate |
+| 없는 검색어를 있다고 착각할 수 있나? | 가능 / 불가능 |
+| 새 검색어 추가가 가능한가? | 가능 / 불가능 |
+| 오래된 검색어 삭제가 가능한가? | 가능 / 불가능 |
+| 자동완성 prefix_query가 가능한가? | 가능 / 불가능 |
+| range_query가 가능한가? | 가능 / 불가능 |
+| 메모리를 많이 쓰는 편인가? | 실제 memory_usage 결과 기반으로 설명 |
+
+2. 상황별 실험 결과
+
+지원 여부, 시간 같은 말만 쓰지 말고,
+"사용자 상황에서 무슨 일이 일어났는지"가 보이게 설명해줘.
+
+| 사용자 상황 | 실제 MCP 호출 | 실제 결과 | 이게 의미하는 것 |
+| --- | --- | --- | --- |
+| apple을 검색함 | contains("apple") | true/false | 등록된 검색어를 찾았는지 |
+| applf라는 오타 입력 | contains("applf") | true/false | false positive가 발생했는지 |
+| applepay가 새 트렌드가 됨 | insert + contains | 성공/N/A | 새 키워드 추가가 가능한지 |
+| appstore를 삭제함 | delete + contains | 성공/N/A | 만료 키워드 제거가 가능한지 |
+| app 자동완성 요청 | prefix_query("app") | count 또는 N/A | 자동완성에 쓸 수 있는지 |
+| app~banana 구간 조회 | range_query("app", "banana") | count 또는 N/A | 정렬된 키워드 구간 조회가 가능한지 |
+| 메모리 확인 | memory_usage() | bytes, bits_per_item | 운영 비용이 어느 정도인지 |
+| 오탐률 확인 | false_positive_rate() | measured FPR | 없는 검색어를 있다고 착각하는 비율 |
+
+3. 필터 내부 원리 설명
+
+이 서버가 어떤 자료구조인지 5문장 이내로 쉽게 설명해줘.
+
+예시 방향:
+- Naive Set이면: full key를 그대로 저장해서 정확하지만 메모리를 많이 쓴다.
+- Bloom이면: 여러 hash로 bit array를 표시해서 메모리를 아끼지만 false positive가 가능하다.
+- Counting Bloom이면: bit 대신 counter를 써서 삭제를 지원한다.
+- Cuckoo면: key 전체 대신 fingerprint를 bucket에 저장한다.
+- SuRF면: 정렬된 문자열의 prefix 구조를 저장해 prefix/range query를 지원한다.
+
+4. 간단 시각화
+
+가능하면 이 필터를 이해할 수 있는 작은 ASCII 그림 또는 Mermaid diagram을 하나 넣어줘.
+너무 복잡하게 그리지 말고, 발표 슬라이드에 넣을 수 있을 정도로 단순하게 그려줘.
+
+예시:
+- Bloom 계열: key -> hash functions -> bit/counter array
+- Cuckoo: key -> fingerprint -> bucket1 or bucket2
+- SuRF: root -> app -> apple/application/appstore
+- Naive Set: set 안에 full keys 저장
+
+5. 발표용 3줄 요약
+
+마지막에 발표자가 그대로 읽을 수 있게 3줄로 요약해줘.
+
+형식:
+1. 이 필터의 핵심 장점:
+2. 이 필터의 핵심 한계:
+3. 검색창 자동완성 사전 관리에서 적합한 경우:
 
 ============================================================
 발표자가 이해할 실험 의미
