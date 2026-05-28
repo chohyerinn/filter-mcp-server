@@ -1,4 +1,4 @@
-
+{서버 이름} mcp만 이용해줘.
 0. 검색어 사전을 만들어서 키워드 app, apple, application, appstore, banana, bank, baseball, camera, campus, car 을 넣어줘.
 1. apple
 2. applf
@@ -75,3 +75,39 @@ test_count =
 * prefix/range capability:
 * exact or approximate:
 
+---
+
+#LLM 분석
+
+아래는 동일한 workload를 5개의 MCP 서버로 실험한 결과이다.
+
+분석 대상:
+
+* filter-naive
+* filter-bloom
+* filter-counting-bloom
+* filter-cuckoo
+* filter-surf
+
+중요:
+
+* 아래 결과만 기반으로 분석해줘.
+* unsupported는 unsupported 그대로 유지해줘.
+* 단순 숫자 비교보다,
+  왜 이런 차이가 발생하는지와
+  자료구조 trade-off 중심으로 설명해줘.
+
+[여기에 5개 서버 결과 붙여넣기]
+
+다음을 분석해줘:
+
+1. 각 자료구조의 동작 방식 차이
+2. 왜 delete/prefix/range 지원 여부가 달라지는지
+3. exact vs approximate 차이
+4. 어떤 workload에 적합한지
+5. 각 구조의 장점과 한계
+
+마지막에 아래 표를 작성해줘.
+
+| Structure | Exact | False Positive | Delete | Prefix/Range | Best Use Case |
+| --------- | ----- | -------------- | ------ | ------------ | ------------- |
