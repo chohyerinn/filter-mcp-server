@@ -3,18 +3,79 @@
 단, SuRF처럼 특별한 기능은 추가 질문으로 강조
 
 
-app, apple, application, appstore, banana, bank, baseball, camera, campus, car
-검색어 사전 등록
-
-1. "apple"이 등록된 검색어인지 확인해줘.
-2. "applf"라는 오타 검색어가 등록되어 있는지 확인해줘.
+0. 검색어 사전을 만들어서 키워드 app, apple, application, appstore, banana, bank, baseball, camera, campus, car 을 넣어줘.
+1. apple
+2. applf
 3. 새 트렌드 검색어 "applepay"를 등록해줘.
-4. "applepay"가 등록됐는지 다시 확인해줘.
+4. applepay 
 5. 오래된 검색어 "appstore"를 삭제해줘.
 6. "appstore"가 아직 등록되어 있는지 다시 확인해줘.
-7. 사용자가 검색창에 "app"까지만 입력했어. 자동완성 후보가 몇 개인지 확인해줘.
+7. "app"까지만 입력했어. 자동완성 후보가 몇 개인지 확인해줘.
 8. 사전식 순서로 "app" 이상, "banana" 미만의 검색어 묶음을 확인해줘.
 9. 이 검색어 사전이 사용하는 메모리를 알려줘.
 10. 없는 검색어를 있다고 착각할 가능성(false positive rate)을 알려줘.
 11. "applepay" 삭제 후에 재검색하면 조회 안돼?
-12. "app" 으로 시작하는 검색어를 모두 찾아줘.
+
+12. 
+지금까지의 MCP tool response만 사용해서 실험 핵심 결과만 정규화해서 추출해줘.
+
+중요:
+* conversational 설명 제거
+* 이모지 제거
+* 보조 추론 제거
+* unsupported 기능은 unsupported 그대로 유지
+* tool이 반환하지 않은 keyword 목록을 새로 만들지 마
+* "대신 직접 조회해볼게요" 같은 대체 행동 금지
+* 실제 MCP tool response 기반 값만 사용
+
+아래 형식으로만 복사가능한 형태로 출력해줘.
+
+[SERVER]
+{SERVER_NAME}
+
+[BUILD]
+n_items =
+build_time_ms =
+config_used =
+
+[CONTAINS]
+contains("apple") =
+contains("applf") =
+contains("applepay") =
+
+[INSERT]
+insert("applepay") =
+insert_time_us =
+
+[DELETE]
+delete("appstore") =
+supported =
+delete_time_us =
+reason =
+
+[PREFIX_QUERY]
+prefix_query("app") =
+supported =
+query_time_us =
+
+[RANGE_QUERY]
+range_query("app","banana") =
+supported =
+query_time_us =
+
+[MEMORY_USAGE]
+bytes =
+bits_per_item =
+n_items =
+
+[FALSE_POSITIVE_RATE]
+theoretical_fpr =
+measured_fpr =
+test_count =
+
+[NOTES]
+
+* delete support:
+* prefix/range capability:
+* exact or approximate:
+
