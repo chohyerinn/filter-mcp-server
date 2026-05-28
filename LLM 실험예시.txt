@@ -1,61 +1,20 @@
-{SERVER_NAME} 서버를 실제 MCP tool로 호출해서
-"검색창 자동완성 사전 관리" 실험을 해줘.
+공통 데이터 10개는 모든 서버 동일
+공통 요청도 최대한 동일
+단, SuRF처럼 특별한 기능은 추가 질문으로 강조
 
-등록된 검색어:
-["app", "apple", "application", "appstore", "banana", "bank", "baseball", "camera", "campus", "car"]
 
-먼저 build()를 호출해줘.
+app, apple, application, appstore, banana, bank, baseball, camera, campus, car
+검색어 사전 등록
 
-config:
-{
-  "target_fpr": 0.01,
-  "expected_items": 10,
-  "fingerprint_bits": 12,
-  "bucket_size": 4,
-  "counter_bits": 4,
-  "suffix_bits": 8,
-  "trie_depth": 8
-}
-
-그 다음 아래 상황을 실제 MCP tool로 확인해줘.
-
-1. "apple"이 등록된 검색어인지 확인: contains("apple")
-2. "applf"라는 오타를 있다고 착각하는지 확인: contains("applf")
-3. 새 트렌드 검색어 "applepay" 추가: insert("applepay") 후 contains("applepay")
-4. 오래된 검색어 "appstore" 삭제: delete("appstore") 후 contains("appstore")
-5. "app" 자동완성 후보 확인: prefix_query("app")
-6. "app" 이상 "banana" 미만 구간 조회: range_query("app", "banana")
-7. 메모리 사용량 확인: memory_usage()
-8. 없는 검색어 1000개로 오탐률 확인: false_positive_rate(absent_queries_1000)
-
-absent_queries_1000:
-- 오타형 500개: applf_000~applf_249, bananna_000~bananna_249
-- 랜덤형 500개: xyz_000~xyz_249, qwerty_000~qwerty_249
-
-출력은 아래 형식으로 정리해줘.
-
-1. 한눈에 보는 요약
-- 정확한 필터인지 approximate filter인지
-- false positive 가능 여부
-- insert/delete 가능 여부
-- prefix/range query 가능 여부
-- memory_usage 결과
-
-2. 상황별 결과 표
-| 상황 | MCP 호출 | 실제 결과 | 쉬운 해석 |
-
-3. 이 필터의 동작 원리
-5문장 이내로 쉽게 설명해줘.
-
-4. 간단 시각화
-이 필터를 이해할 수 있는 ASCII 그림 또는 Mermaid diagram을 하나 넣어줘.
-
-5. 발표용 3줄 요약
-- 핵심 장점
-- 핵심 한계
-- 이 검색어 사전 시나리오에서 적합한 경우
-
-중요:
-- 반드시 실제 {SERVER_NAME} MCP tool 호출 결과만 사용해줘.
-- 지원하지 않는 기능은 N/A라고 표시해줘.
-- 추측해서 결과를 만들지 마.
+1. "apple"이 등록된 검색어인지 확인해줘.
+2. "applf"라는 오타 검색어가 등록되어 있는지 확인해줘.
+3. 새 트렌드 검색어 "applepay"를 등록해줘.
+4. "applepay"가 등록됐는지 다시 확인해줘.
+5. 오래된 검색어 "appstore"를 삭제해줘.
+6. "appstore"가 아직 등록되어 있는지 다시 확인해줘.
+7. 사용자가 검색창에 "app"까지만 입력했어. 자동완성 후보가 몇 개인지 확인해줘.
+8. 사전식 순서로 "app" 이상, "banana" 미만의 검색어 묶음을 확인해줘.
+9. 이 검색어 사전이 사용하는 메모리를 알려줘.
+10. 없는 검색어를 있다고 착각할 가능성(false positive rate)을 알려줘.
+11. "applepay" 삭제 후에 재검색하면 조회 안돼?
+12. "app" 으로 시작하는 검색어를 모두 찾아줘.
