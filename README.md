@@ -79,7 +79,7 @@ All MCP servers provide the following tools:
 | `false_positive_rate()` | Measure false positive rate |
 
 
-## Structure Comparison
+## Theoretical / Qualitative Structure Comparison
 
 | Structure | False Positives | Delete Support | Prefix/Range Query | Memory Efficiency |
 |---|---|---|---|---|
@@ -88,6 +88,36 @@ All MCP servers provide the following tools:
 | Counting Bloom Filter | Yes | Yes | No | High |
 | Cuckoo Filter | Yes | Yes | No | High |
 | Simplified SuRF | Yes | No | Yes | Medium |
+
+This table describes the expected qualitative behavior of each structure. It is not a measured benchmark result.
+
+
+
+## Benchmark Results
+
+Measured results are available in [docs/benchmark_results.md](docs/benchmark_results.md).
+
+The benchmark uses fixed synthetic workloads from `src/membership_filters/benchmark.py` and compares all filters with the same build items and absent-query probes. It reports estimated memory from `memory_usage()` and measured false positive rate from `false_positive_rate()`.
+
+Run it locally:
+
+```bash
+PYTHONPATH=src python -m membership_filters.benchmark
+```
+
+```powershell
+$env:PYTHONPATH='src'; python -m membership_filters.benchmark
+```
+
+Run the smoke tests:
+
+```bash
+PYTHONPATH=src python -m unittest discover -s tests
+```
+
+```powershell
+$env:PYTHONPATH='src'; python -m unittest discover -s tests
+```
 
 
 
