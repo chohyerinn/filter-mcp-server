@@ -2,19 +2,13 @@
 
 ## Overview
 
-This project compares several approximate filter data structures using MCP servers and LLM tool calls.
+Five approximate-membership data structures, each exposed through the **same MCP tool interface**, so one workload can be run against all of them and compared on the trade-offs that actually matter: false-positive rate, memory, latency, and which operations they support — with an exact hash-set server as the baseline control.
 
-Approximate filters reduce memory usage by storing compressed summaries instead of full keys.  
-Because of this trade-off, some filters may return false positives or support limited operations.
+- **Bloom · Counting Bloom · Cuckoo · SuRF**, plus an exact-set baseline
+- One ADT-style interface across every server → swap the structure, keep the test
+- Measures *what each filter gives up*, not just whether membership "works"
 
-The project compares:
-
-- Bloom Filter
-- Counting Bloom Filter
-- Cuckoo Filter
-- SuRF (Simplified Version)
-
-An exact hash-set server is also included as a baseline for comparison.
+Approximate filters save memory by storing compressed summaries instead of full keys, and pay for it with false positives or limited operations. I first met these structures in a data-structures course; the goal here was to put them on the same measurable footing — same interface, same workload — instead of just reading about their Big-O.
 
 
 
