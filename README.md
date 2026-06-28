@@ -97,7 +97,7 @@ This table describes the expected qualitative behavior of each structure. It is 
 
 Measured results are available in [docs/benchmark_results.md](docs/benchmark_results.md).
 
-The benchmark uses fixed synthetic workloads from `src/membership_filters/benchmark.py` and compares all filters with the same build items and absent-query probes. It reports estimated memory from `memory_usage()` and measured false positive rate from `false_positive_rate()`.
+The benchmark uses fixed synthetic workloads from `src/membership_filters/benchmark.py` and compares all filters with the same build items and absent-query probes. It reports estimated memory from `memory_usage()`, measured false positive rate from `false_positive_rate()`, and average local `contains()` latency.
 
 Run it locally:
 

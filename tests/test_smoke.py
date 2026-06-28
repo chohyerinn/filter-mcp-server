@@ -42,7 +42,9 @@ class FilterSmokeTests(unittest.TestCase):
                 for row in rows:
                     self.assertIn("memory", row)
                     self.assertIn("false_positive_rate", row)
+                    self.assertIn("avg_contains_us", row)
                     self.assertIn("measured", row["false_positive_rate"])
+                    self.assertGreater(row["avg_contains_us"], 0.0)
 
 
 if __name__ == "__main__":

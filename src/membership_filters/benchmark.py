@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
+import time
 from dataclasses import dataclass
 
 from .registry import FILTER_NAMES, create_filter
+
+TABLE_WIDTH = 122
 
 
 def numbered(prefix: str, count: int) -> list[str]:
@@ -71,6 +74,20 @@ DEFAULT_CONFIG = {
 }
 
 
+def contains_latency_us(
+    filter_obj,
+    queries: list[str],
+    iterations: int = 10_000,
+) -> float:
+    if not queries:
+        return 0.0
+
+    start = time.perf_counter_ns()
+    for index in range(iterations):
+        filter_obj.contains(queries[index % len(queries)])
+    return (time.perf_counter_ns() - start) / iterations / 1000
+
+
 def run_filter(filter_name: str, scenario: Scenario, config: dict | None = None) -> dict:
     filter_obj = create_filter(filter_name)
 
@@ -99,6 +116,9 @@ def run_filter(filter_name: str, scenario: Scenario, config: dict | None = None)
     range_result = filter_obj.range_query(*scenario.range_bounds)
     prefix_result = filter_obj.prefix_query(scenario.prefix)
 
+    latency_queries = scenario.build_items[:100] + scenario.absent_queries[:100]
+    avg_contains_us = contains_latency_us(filter_obj, latency_queries)
+
     fpr_result = filter_obj.false_positive_rate(
         scenario.absent_queries
     )
@@ -122,6 +142,7 @@ def run_filter(filter_name: str, scenario: Scenario, config: dict | None = None)
         "delete_attempts": len(delete_results),
         "range_query": range_result,
         "prefix_query": prefix_result,
+        "avg_contains_us": avg_contains_us,
         "memory": filter_obj.memory_usage(),
         "state_summary": filter_obj.internal_state(),
     }
@@ -153,9 +174,9 @@ def print_summary(results: dict[str, list[dict]]) -> None:
     for scenario_name, rows in results.items():
 
         print()
-        print("=" * 110)
+        print("=" * TABLE_WIDTH)
         print(f"SCENARIO: {scenario_name}")
-        print("=" * 110)
+        print("=" * TABLE_WIDTH)
 
         print(
             f"{'Filter':<18}"
@@ -164,12 +185,13 @@ def print_summary(results: dict[str, list[dict]]) -> None:
             f"{'Bits/Item':>12}"
             f"{'FPR':>12}"
             f"{'FP':>8}"
+            f"{'Avg us/q':>12}"
             f"{'Delete':>10}"
             f"{'Prefix':>10}"
             f"{'Range':>10}"
         )
 
-        print("-" * 110)
+        print("-" * TABLE_WIDTH)
 
         for row in rows:
 
@@ -193,6 +215,7 @@ def print_summary(results: dict[str, list[dict]]) -> None:
                 f"{memory['bits_per_item']:>12.2f}"
                 f"{fpr['measured']:>12.4f}"
                 f"{row['false_positives']:>8}"
+                f"{row['avg_contains_us']:>12.2f}"
                 f"{str(row['delete_supported']):>10}"
                 f"{str(prefix_supported):>10}"
                 f"{str(range_supported):>10}"
